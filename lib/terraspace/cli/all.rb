@@ -9,7 +9,7 @@ class Terraspace::CLI
     option :destroy_workspace, type: :boolean,
                                desc: 'Also destroy the Cloud workspace. Only applies when using Terraform Cloud remote backend.'
     def down(*stacks)
-      Terraspace::All::Runner.new('down', @options.merge(stacks:)).run
+      Terraspace::All::Runner.new('down', @options.merge(stacks: stacks)).run
     end
 
     desc 'graph', 'Draw a dependency graph.'
@@ -18,57 +18,57 @@ class Terraspace::CLI
     option :full, type: :boolean,
                   desc: 'draw the full graph with highlighted nodes or draw the subgraph. text format defaults to false, graph format defaults to true'
     def graph(*stacks)
-      Terraspace::All::Grapher.new(@options.merge(stacks:)).run
+      Terraspace::All::Grapher.new(@options.merge(stacks: stacks)).run
     end
 
     desc 'init', 'Init all or multiple stacks.'
     long_desc Help.text('all/init')
     def init(*stacks)
-      Terraspace::All::Runner.new('init', @options.merge(stacks:)).run
+      Terraspace::All::Runner.new('init', @options.merge(stacks: stacks)).run
     end
 
     desc 'refresh', 'Refresh all or multiple stacks.'
     long_desc Help.text('all/refresh')
     def refresh(*stacks)
-      Terraspace::All::Runner.new('refresh', @options.merge(stacks:)).run
+      Terraspace::All::Runner.new('refresh', @options.merge(stacks: stacks)).run
     end
 
     desc 'output', 'Show output for all or multiple stacks.'
     long_desc Help.text('all/output')
     def output(*stacks)
-      Terraspace::All::Runner.new('output', @options.merge(stacks:)).run
+      Terraspace::All::Runner.new('output', @options.merge(stacks: stacks)).run
     end
 
     desc 'plan', 'Run plan for all or multiple stacks.'
     long_desc Help.text('all/plan')
     option :out, aliases: :o, desc: 'Output path. Can be a pattern like :MOD_NAME.plan'
     def plan(*stacks)
-      Terraspace::All::Runner.new('plan', @options.merge(stacks:)).run
+      Terraspace::All::Runner.new('plan', @options.merge(stacks: stacks)).run
     end
 
     desc 'providers', 'Show providers for all or multiple stacks.'
     long_desc Help.text('all/providers')
     def providers(*stacks)
-      Terraspace::All::Runner.new('providers', @options.merge(stacks:)).run
+      Terraspace::All::Runner.new('providers', @options.merge(stacks: stacks)).run
     end
 
     desc 'show', 'Run show for all or multiple stacks.'
     long_desc Help.text('all/show')
     def show(*stacks)
-      Terraspace::All::Runner.new('show', @options.merge(stacks:)).run
+      Terraspace::All::Runner.new('show', @options.merge(stacks: stacks)).run
     end
 
     desc 'up', 'Deploy all or multiple stacks.'
     long_desc Help.text('all/up')
     option :plan, desc: 'Plan path. Can be a pattern like :MOD_NAME.plan'
     def up(*stacks)
-      Terraspace::All::Runner.new('up', @options.merge(stacks:)).run
+      Terraspace::All::Runner.new('up', @options.merge(stacks: stacks)).run
     end
 
     desc 'validate', 'Validate all or multiple stacks.'
     long_desc Help.text('all/validate')
     def validate(*stacks)
-      Terraspace::All::Runner.new('validate', @options.merge(stacks:)).run
+      Terraspace::All::Runner.new('validate', @options.merge(stacks: stacks)).run
     end
   end
 end

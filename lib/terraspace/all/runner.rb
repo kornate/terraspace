@@ -124,7 +124,7 @@ module Terraspace::All
     end
 
     def run_terraspace(mod_name)
-      set_log_path!(mod_name) if fork?
+      set_log_path!(mod_name)# if fork?
       name = command_map(@command)
       o = @options.merge(mod: mod_name, yes: true, build: false, input: false, log_to_stderr: true)
       o.merge!(quiet: false) if @command == 'init' # noisy so can filter and summarize output
