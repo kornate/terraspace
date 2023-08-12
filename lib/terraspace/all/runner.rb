@@ -3,8 +3,9 @@ module Terraspace::All
     include Terraspace::Util
     extend Memoist
 
-    def initialize(command, options={})
-      @command, @options = command, options
+    def initialize(command, options = {})
+      @command = command
+      @options = options
       super(options)
     end
 
@@ -23,15 +24,15 @@ module Terraspace::All
 
     def build_batches
       @batches = Terraspace::Dependency::Resolver.new(@options).resolve
-      @batches.reverse! if @command == "down"
+      @batches.reverse! if @command == 'down'
       @batches
     end
 
     def deploy_batches
       truncate_logs if ENV['TS_TRUNCATE_LOGS']
       build_modules
-      @batches.each_with_index do |batch,i|
-        logger.info "Batch Run #{i+1}:"
+      @batches.each_with_index do |batch, i|
+        logger.info "Batch Run #{i + 1}:"
         deploy_batch(batch)
       end
     end
@@ -52,6 +53,7 @@ module Terraspace::All
         end
       end
       return unless fork?
+
       wait_for_child_proccess
       summarize     # also reports lower-level error info
       report_errors # reports finall errors and possibly exit
@@ -63,13 +65,15 @@ module Terraspace::All
     end
 
     def build_modules
-      builder = Terraspace::Builder.new(@options.merge(mod: "placeholder", clean: true, quiet: true, include_stacks: :none))
+      builder = Terraspace::Builder.new(@options.merge(mod: 'placeholder', clean: true, quiet: true,
+                                                       include_stacks: :none))
       builder.build(modules: true)
     end
 
     def build_stack(name)
-      include_stacks = @command == "down" ? :root_with_children : :root_only
-      builder = Terraspace::Builder.new(@options.merge(mod: name, clean: false, quiet: true, include_stacks: include_stacks))
+      include_stacks = @command == 'down' ? :root_with_children : :root_only
+      builder = Terraspace::Builder.new(@options.merge(mod: name, clean: false, quiet: true,
+                                                       include_stacks:))
       builder.build(modules: false)
     end
 
@@ -88,9 +92,9 @@ module Terraspace::All
         terraspace_command = terraspace_command(mod_name)
         logger.error "Error running: #{terraspace_command}. Fix the error above or check logs for the error.".color(:red)
       end
-      unless @errors.empty?
-        exit 2 if exit_on_fail?
-      end
+      return if @errors.empty?
+
+      exit 2 if exit_on_fail?
     end
 
     # Precendence:
@@ -99,6 +103,7 @@ module Terraspace::All
     # 3. config/app.rb setting
     def exit_on_fail?
       return false if ENV['TS_EXIT_ON_FAIL'] == '0'
+
       if @options[:exit_on_fail].nil?
         Terraspace.config.all.exit_on_fail[@command]
       else
@@ -111,7 +116,7 @@ module Terraspace::All
         data = {
           command: @command,
           log_path: log_path(mod_name),
-          terraspace_command: terraspace_command(mod_name),
+          terraspace_command: terraspace_command(mod_name)
         }
         # Its possible for log file to not get created if RemoteState::Fetcher#validate! fails
         Summary.new(data).run if File.exist?(data[:log_path])
@@ -122,13 +127,13 @@ module Terraspace::All
       set_log_path!(mod_name) if fork?
       name = command_map(@command)
       o = @options.merge(mod: mod_name, yes: true, build: false, input: false, log_to_stderr: true)
-      o.merge!(quiet: false) if @command == "init" # noisy so can filter and summarize output
+      o.merge!(quiet: false) if @command == 'init' # noisy so can filter and summarize output
       case @command
-      when "up"
+      when 'up'
         Terraspace::CLI::Up.new(o).run
-      when "down"
+      when 'down'
         Terraspace::CLI::Down.new(o).run
-      when "plan"
+      when 'plan'
         Terraspace::CLI::Plan.new(o).run
       else
         Terraspace::CLI::Commander.new(name, o).run
@@ -141,16 +146,33 @@ module Terraspace::All
 
     def set_log_path!(mod_name)
       command = terraspace_command(mod_name)
+      if @options[:logs]
+        log_to_stdout(command)
+      else
+        log_to_file(mod_name, command)
+      end
+    end
+
+    def log_to_stdout(command)
+      logger.info "Running: #{command.bright} Logs: stdout"
+      Terraspace.logger = Logger.new(STDOUT)
+    end
+
+    def log_to_file(mod_name, command)
       path = log_path(mod_name)
       pretty_path = Terraspace::Util.pretty_path(path)
       logger.info "Running: #{command.bright} Logs: #{pretty_path}"
 
       FileUtils.mkdir_p(File.dirname(path))
-      logger = Terraspace::Logger.new(path)
-      logger.level = Terraspace.config.logger.level # match the level that user configured
-      logger.formatter = Terraspace.config.logger.formatter # match the level that user configured
+      file_logger = Terraspace::Logger.new(path)
+      configure_logger(file_logger, command)
+      Terraspace.logger = file_logger
+    end
+
+    def configure_logger(logger, command)
+      logger.level = Terraspace.config.logger.level
+      logger.formatter = Terraspace.config.logger.formatter
       logger.progname = command
-      Terraspace.logger = logger
     end
 
     def log_path(mod_name)
@@ -168,14 +190,15 @@ module Terraspace::All
 
     def command_map(name)
       map = {
-        up:   "apply",
-        down: "destroy",
+        up: 'apply',
+        down: 'destroy'
       }.stringify_keys
       map[name] || name
     end
 
     def are_you_sure?
       return true unless sure_command?
+
       sure? # from Util
     end
 
@@ -187,7 +210,7 @@ module Terraspace::All
       t1 = Time.now
       yield
       t2 = Time.now
-      logger.info "Time took: #{pretty_time(t2-t1)}"
+      logger.info "Time took: #{pretty_time(t2 - t1)}"
     end
   end
 end
