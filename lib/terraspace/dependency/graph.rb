@@ -22,6 +22,8 @@ module Terraspace::Dependency
 
     # Only check when stacks option is pass. Edge case: There can be app/modules but no app/stacks yet
     def check_empty_nodes!
+      logger.info "DEBUG: options[:stacks]: #{@options[:stacks].inspect}"
+      logger.info "DEBUG: @nodes: #{@nodes].inspect}"
       return unless @nodes.empty? && @options[:stacks]
       logger.error "ERROR: No stacks were found that match: #{@options[:stacks].join(' ')}".color(:red)
       exit 1
