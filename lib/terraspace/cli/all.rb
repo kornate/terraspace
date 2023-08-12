@@ -2,6 +2,7 @@ class Terraspace::CLI
   class All < Terraspace::Command
     class_option :yes, aliases: :y, type: :boolean, desc: 'auto approve all batch commands'
     class_option :exit_on_fail, type: :boolean, desc: 'whether or not to exit when one of the batch commands fails'
+    class_option :logs, type: :boolean, desc: 'output logs to stdout instead of a file'
 
     desc 'down', 'Destroy all or multiple stacks.'
     long_desc Help.text('all/down')
@@ -60,7 +61,6 @@ class Terraspace::CLI
     desc 'up', 'Deploy all or multiple stacks.'
     long_desc Help.text('all/up')
     option :plan, desc: 'Plan path. Can be a pattern like :MOD_NAME.plan'
-    option :logs, type: :boolean, desc: 'Output logs to stdout instead of a file'
     def up(*stacks)
       Terraspace::All::Runner.new('up', @options.merge(stacks:)).run
     end
