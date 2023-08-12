@@ -2,7 +2,7 @@ class Terraspace::CLI
   class All < Terraspace::Command
     class_option :yes, aliases: :y, type: :boolean, desc: 'auto approve all batch commands'
     class_option :exit_on_fail, type: :boolean, desc: 'whether or not to exit when one of the batch commands fails'
-    class_option :logs, type: :boolean, desc: 'output logs to stdout instead of a file'
+    class_option :stdout, type: :boolean, desc: 'output logs to stdout instead of file'
 
     desc 'down', 'Destroy all or multiple stacks.'
     long_desc Help.text('all/down')

@@ -146,7 +146,7 @@ module Terraspace::All
 
     def set_log_path!(mod_name)
       command = terraspace_command(mod_name)
-      if @options[:logs]
+      if @options[:stdout]
         log_to_stdout(command)
       else
         log_to_file(mod_name, command)
